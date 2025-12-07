@@ -1,0 +1,216 @@
+Завдання 1 — Клас DiscountBill
+
+Потрібні дані про Item:
+
+public class Item {
+    private String name;
+    private double price;
+    private double discount;
+
+    public Item(String name, double price, double discount) {
+        this.name = name;
+        this.price = price;
+        this.discount = discount;
+    }
+
+    public double getPrice() { return price; }
+    public double getDiscount() { return discount; }
+}
+
+GroceryBill (вихідний):
+
+import java.util.*;
+
+public class GroceryBill {
+    protected Employee clerk;
+    protected List<Item> items = new ArrayList<>();
+
+    public GroceryBill(Employee clerk) {
+        this.clerk = clerk;
+    }
+
+    public void add(Item i) {
+        items.add(i);
+    }
+
+    public double getTotal() {
+        double sum = 0;
+        for (Item i : items) sum += i.getPrice();
+        return sum;
+    }
+}
+
+DiscountBill
+
+public class DiscountBill extends GroceryBill {
+
+    private boolean regular;
+    private int discountCount = 0;
+    private double discountAmount = 0.0;
+
+    public DiscountBill(Employee clerk, boolean regularCustomer) {
+        super(clerk);
+        this.regular = regularCustomer;
+    }
+
+    @Override
+    public void add(Item i) {
+        super.add(i);
+
+        if (regular && i.getDiscount() > 0) {
+            discountCount++;
+            discountAmount += i.getDiscount();
+        }
+    }
+
+    @Override
+    public double getTotal() {
+        if (!regular) return super.getTotal();
+        return super.getTotal() - discountAmount;
+    }
+
+    public int getDiscountCount() {
+        return regular ? discountCount : 0;
+    }
+
+    public double getDiscountAmount() {
+        return regular ? discountAmount : 0.0;
+    }
+
+    public double getDiscountPercent() {
+        if (!regular) return 0.0;
+
+        double full = super.getTotal();
+        double finalPrice = getTotal();
+
+        if (full == 0) return 0.0;
+
+        return 100 - (finalPrice * 100 / full);
+    }
+}
+
+Завдання 4 — Клас DiscountBill2 (композиція)
+public class DiscountBill2 {
+
+    private GroceryBill bill;
+    private boolean regular;
+
+    private int discountCount = 0;
+    private double discountAmount = 0;
+
+    public DiscountBill2(Employee clerk, boolean regularCustomer) {
+        this.bill = new GroceryBill(clerk);
+        this.regular = regularCustomer;
+    }
+
+    public void add(Item i) {
+        bill.add(i);
+        if (regular && i.getDiscount() > 0) {
+            discountCount++;
+            discountAmount += i.getDiscount();
+        }
+    }
+
+    public double getTotal() {
+        double total = bill.getTotal();
+        return regular ? total - discountAmount : total;
+    }
+
+    public int getDiscountCount() { return regular ? discountCount : 0; }
+
+    public double getDiscountAmount() { return regular ? discountAmount : 0; }
+
+    public double getDiscountPercent() {
+        double full = bill.getTotal();
+        if (full == 0 || !regular) return 0;
+        return 100 - ((getTotal() * 100) / full);
+    }
+}
+Завдання 2 — Клас MinMaxAccount
+public class MinMaxAccount extends BankingAccount {
+
+    private int min;
+    private int max;
+
+    public MinMaxAccount(Startup s) {
+        super(s);
+        this.min = balance;
+        this.max = balance;
+    }
+
+    private void updateMinMax() {
+        if (balance < min) min = balance;
+        if (balance > max) max = balance;
+    }
+
+    @Override
+    public void credit(int amount) {
+        super.credit(amount);
+        updateMinMax();
+    }
+
+    @Override
+    public void debit(int amount) {
+        super.debit(amount);
+        updateMinMax();
+    }
+
+    public int getMin() { return min; }
+    public int getMax() { return max; }
+}
+
+Завдання 3 — Клас Point3D
+public class Point3D extends Point {
+
+    protected int z;
+
+    public Point3D() {
+        super(0, 0);
+        this.z = 0;
+    }
+
+    public Point3D(int x, int y, int z) {
+        super(x, y);
+        this.z = z;
+    }
+
+    public void setLocation(int x, int y, int z) {
+        super.setLocation(x, y);
+        this.z = z;
+    }
+
+    @Override
+    public void setLocation(int x, int y) {
+        super.setLocation(x, y);
+        this.z = 0;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    @Override
+    public double distance(Point p) {
+        if (!(p instanceof Point3D)) {
+            return super.distance(p);
+        }
+        Point3D q = (Point3D) p;
+
+        return Math.sqrt(
+                (x - q.x) * (x - q.x) +
+                (y - q.y) * (y - q.y) +
+                (z - q.z) * (z - q.z)
+        );
+    }
+
+    @Override
+    public double distanceFromOrigin() {
+        return Math.sqrt(x*x + y*y + z*z);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ", " + z + ")";
+    }
+}
+
